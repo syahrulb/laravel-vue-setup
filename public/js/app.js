@@ -2035,17 +2035,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      email: '',
-      age: null,
-      password: '',
-      confirmPassword: '',
-      country: 'usa',
-      hobbyInputs: [],
-      terms: false
+      user: {
+        email: '',
+        name: '',
+        age: null,
+        password: '',
+        confirmPassword: '',
+        country: 'usa',
+        hobbyInputs: [],
+        terms: false
+      }
     };
   },
   methods: {
@@ -2054,27 +2064,16 @@ __webpack_require__.r(__webpack_exports__);
         id: Math.random() * Math.random() * 1000,
         value: ''
       };
-      this.hobbyInputs.push(newHobby);
+      this.user.hobbyInputs.push(newHobby);
     },
     onDeleteHobby: function onDeleteHobby(id) {
-      this.hobbyInputs = this.hobbyInputs.filter(function (hobby) {
+      this.user.hobbyInputs = this.user.hobbyInputs.filter(function (hobby) {
         return hobby.id !== id;
       });
     },
     onSubmit: function onSubmit() {
       var _this = this;
 
-      var formData = {
-        email: this.email,
-        age: this.age,
-        password: this.password,
-        confirmPassword: this.confirmPassword,
-        country: this.country,
-        hobbies: this.hobbyInputs.map(function (hobby) {
-          return hobby.value;
-        }),
-        terms: this.terms
-      };
       this.$swal({
         title: 'Apakah Anda Yakin?',
         icon: 'question',
@@ -2084,20 +2083,40 @@ __webpack_require__.r(__webpack_exports__);
         confirmButtonText: 'Ya',
         cancelButtonText: 'Tidak',
         showCloseButton: true,
-        showLoaderOnConfirm: true
-      }).then(function (result) {
-        if (result.value) {
-          axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/signup', formData).then(function (res) {
-            return console.log(res);
+        showLoaderOnConfirm: true,
+        allowOutsideClick: function allowOutsideClick() {
+          return _this.$swal.isLoading();
+        },
+        preConfirm: function preConfirm() {
+          return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/signup', _this.user).then(function (res) {
+            return res;
           })["catch"](function (error) {
-            return console.log(error);
+            return error;
           });
+        }
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          if (result.value === true) {
+            _this.$swal('Sukses', 'Data telah disimpan di database', 'success');
 
-          _this.$swal('Sukses', 'Data stocks telah dirandom', 'success');
+            _this.onReset();
+          } else {
+            _this.$swal('Sukses', result.value.response.data.results.message, 'error');
+          }
         } else {
-          _this.$swal('Gagal !', 'Data stock belum di akhiri', 'error');
+          _this.$swal('Sukses', 'Data belum disimpan di database', 'error');
         }
       });
+    },
+    onReset: function onReset() {
+      this.email = '';
+      this.name = '';
+      this.age = null;
+      this.password = '';
+      this.confirmPassword = '';
+      this.country = 'usa';
+      this.hobbyInputs = [];
+      this.terms = false;
     }
   }
 });
@@ -41963,18 +41982,43 @@ var render = function() {
                 {
                   name: "model",
                   rawName: "v-model",
-                  value: _vm.email,
-                  expression: "email"
+                  value: _vm.user.email,
+                  expression: "user.email"
                 }
               ],
               attrs: { type: "email", id: "email" },
-              domProps: { value: _vm.email },
+              domProps: { value: _vm.user.email },
               on: {
                 input: function($event) {
                   if ($event.target.composing) {
                     return
                   }
-                  _vm.email = $event.target.value
+                  _vm.$set(_vm.user, "email", $event.target.value)
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "input" }, [
+            _c("label", { attrs: { for: "name" } }, [_vm._v("Name")]),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.user.name,
+                  expression: "user.name"
+                }
+              ],
+              attrs: { type: "name", id: "name" },
+              domProps: { value: _vm.user.name },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.user, "name", $event.target.value)
                 }
               }
             })
@@ -41988,19 +42032,19 @@ var render = function() {
                 {
                   name: "model",
                   rawName: "v-model.number",
-                  value: _vm.age,
-                  expression: "age",
+                  value: _vm.user.age,
+                  expression: "user.age",
                   modifiers: { number: true }
                 }
               ],
               attrs: { type: "number", id: "age" },
-              domProps: { value: _vm.age },
+              domProps: { value: _vm.user.age },
               on: {
                 input: function($event) {
                   if ($event.target.composing) {
                     return
                   }
-                  _vm.age = _vm._n($event.target.value)
+                  _vm.$set(_vm.user, "age", _vm._n($event.target.value))
                 },
                 blur: function($event) {
                   return _vm.$forceUpdate()
@@ -42017,18 +42061,18 @@ var render = function() {
                 {
                   name: "model",
                   rawName: "v-model",
-                  value: _vm.password,
-                  expression: "password"
+                  value: _vm.user.password,
+                  expression: "user.password"
                 }
               ],
-              attrs: { type: "password", id: "password" },
-              domProps: { value: _vm.password },
+              attrs: { type: "password", id: "password", autocomplete: "off" },
+              domProps: { value: _vm.user.password },
               on: {
                 input: function($event) {
                   if ($event.target.composing) {
                     return
                   }
-                  _vm.password = $event.target.value
+                  _vm.$set(_vm.user, "password", $event.target.value)
                 }
               }
             })
@@ -42044,18 +42088,22 @@ var render = function() {
                 {
                   name: "model",
                   rawName: "v-model",
-                  value: _vm.confirmPassword,
-                  expression: "confirmPassword"
+                  value: _vm.user.confirmPassword,
+                  expression: "user.confirmPassword"
                 }
               ],
-              attrs: { type: "password", id: "confirm-password" },
-              domProps: { value: _vm.confirmPassword },
+              attrs: {
+                type: "password",
+                id: "confirm-password",
+                autocomplete: "off"
+              },
+              domProps: { value: _vm.user.confirmPassword },
               on: {
                 input: function($event) {
                   if ($event.target.composing) {
                     return
                   }
-                  _vm.confirmPassword = $event.target.value
+                  _vm.$set(_vm.user, "confirmPassword", $event.target.value)
                 }
               }
             })
@@ -42071,8 +42119,8 @@ var render = function() {
                   {
                     name: "model",
                     rawName: "v-model",
-                    value: _vm.country,
-                    expression: "country"
+                    value: _vm.user.country,
+                    expression: "user.country"
                   }
                 ],
                 attrs: { id: "country" },
@@ -42086,9 +42134,11 @@ var render = function() {
                         var val = "_value" in o ? o._value : o.value
                         return val
                       })
-                    _vm.country = $event.target.multiple
-                      ? $$selectedVal
-                      : $$selectedVal[0]
+                    _vm.$set(
+                      _vm.user,
+                      "country",
+                      $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+                    )
                   }
                 }
               },
@@ -42118,7 +42168,7 @@ var render = function() {
             _c(
               "div",
               { staticClass: "hobby-list" },
-              _vm._l(_vm.hobbyInputs, function(hobbyInput, index) {
+              _vm._l(_vm.user.hobbyInputs, function(hobbyInput, index) {
                 return _c("div", { key: hobbyInput.id, staticClass: "input" }, [
                   _c("label", { attrs: { for: hobbyInput.id } }, [
                     _vm._v("Hobby #" + _vm._s(index))
@@ -42169,34 +42219,36 @@ var render = function() {
                 {
                   name: "model",
                   rawName: "v-model",
-                  value: _vm.terms,
-                  expression: "terms"
+                  value: _vm.user.terms,
+                  expression: "user.terms"
                 }
               ],
               attrs: { type: "checkbox", id: "terms" },
               domProps: {
-                checked: Array.isArray(_vm.terms)
-                  ? _vm._i(_vm.terms, null) > -1
-                  : _vm.terms
+                checked: Array.isArray(_vm.user.terms)
+                  ? _vm._i(_vm.user.terms, null) > -1
+                  : _vm.user.terms
               },
               on: {
                 change: function($event) {
-                  var $$a = _vm.terms,
+                  var $$a = _vm.user.terms,
                     $$el = $event.target,
                     $$c = $$el.checked ? true : false
                   if (Array.isArray($$a)) {
                     var $$v = null,
                       $$i = _vm._i($$a, $$v)
                     if ($$el.checked) {
-                      $$i < 0 && (_vm.terms = $$a.concat([$$v]))
+                      $$i < 0 && _vm.$set(_vm.user, "terms", $$a.concat([$$v]))
                     } else {
                       $$i > -1 &&
-                        (_vm.terms = $$a
-                          .slice(0, $$i)
-                          .concat($$a.slice($$i + 1)))
+                        _vm.$set(
+                          _vm.user,
+                          "terms",
+                          $$a.slice(0, $$i).concat($$a.slice($$i + 1))
+                        )
                     }
                   } else {
-                    _vm.terms = $$c
+                    _vm.$set(_vm.user, "terms", $$c)
                   }
                 }
               }
@@ -42310,7 +42362,7 @@ var render = function() {
       "div",
       { staticClass: "logo" },
       [
-        _c("router-link", { attrs: { to: "/home" } }, [
+        _c("router-link", { attrs: { to: "/" } }, [
           _vm._v("Vue - Complete Guide")
         ])
       ],
@@ -58302,7 +58354,7 @@ __webpack_require__.r(__webpack_exports__);
 
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]);
 var routes = [{
-  path: '/home',
+  path: '/',
   component: _components_pages_welcome__WEBPACK_IMPORTED_MODULE_2__["default"]
 }, {
   path: '/signup',
@@ -58313,9 +58365,15 @@ var routes = [{
 }, {
   path: '/dashboard',
   component: _components_dashboard_dashboard__WEBPACK_IMPORTED_MODULE_3__["default"]
+}, {
+  path: '/404',
+  component: _components_errors_404__WEBPACK_IMPORTED_MODULE_6__["default"]
+}, {
+  path: '*',
+  redirect: '/404'
 }];
 /* harmony default export */ __webpack_exports__["default"] = (new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
-  base: 'server-spa-belajar/admin',
+  base: 'server-spa-belajar',
   mode: 'history',
   routes: routes
 }));

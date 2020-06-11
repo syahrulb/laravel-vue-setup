@@ -15,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password','age','country'
     ];
 
     /**
@@ -35,4 +35,36 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+     /**
+     * The Setter atrribute
+     *
+     * @var function
+     */
+
+    public function setPasswordAttribute($password)
+        {$this->attributes['password'] = bcrypt($password);}
+
+     /**
+     * Relation
+     *
+     * @var function
+     */
+    public function hobby(){
+        return $this->hasMany(Hobby::class);
+    }
+
+    /**
+     * Relation
+     *
+     * @var validation
+     */
+    public static $createRules = [
+       'name'       => 'required|string',
+       'age'        => 'required|integer',
+       'country'    => 'required|string',
+       'email'      => 'required|email|unique:users,email',
+       'nip'        => 'required|string|unique:users,nip',
+       'password'   => 'required|string|confirmed|min:6',
+     ];
 }

@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/{any}', function(){
-    return 'oke';
-})->where('any', '.*');
-// Route::get('/{any}', 'HomeController@index')->where('any', '.*');
+// Route::get('/{any}', function(){
+//     return 'oke';
+// })->where('any', '.*');
+Route::get('/{any}', 'HomeController@index')->where('any', '.*');
 
 // Auth::routes();

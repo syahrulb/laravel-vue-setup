@@ -7,32 +7,39 @@
           <input
                   type="email"
                   id="email"
-                  v-model="email">
+                  v-model="user.email">
+        </div>
+        <div class="input">
+          <label for="name">Name</label>
+          <input
+                  type="name"
+                  id="name"
+                  v-model="user.name">
         </div>
         <div class="input">
           <label for="age">Your Age</label>
           <input
                   type="number"
                   id="age"
-                  v-model.number="age">
+                  v-model.number="user.age">
         </div>
         <div class="input">
           <label for="password">Password</label>
           <input
                   type="password"
                   id="password"
-                  v-model="password">
+                  v-model="user.password" autocomplete="off">
         </div>
         <div class="input">
           <label for="confirm-password">Confirm Password</label>
           <input
                   type="password"
                   id="confirm-password"
-                  v-model="confirmPassword">
+                  v-model="user.confirmPassword" autocomplete="off">
         </div>
         <div class="input">
           <label for="country">Country</label>
-          <select id="country" v-model="country">
+          <select id="country" v-model="user.country">
             <option value="usa">USA</option>
             <option value="india">India</option>
             <option value="uk">UK</option>
@@ -45,7 +52,7 @@
           <div class="hobby-list">
             <div
                     class="input"
-                    v-for="(hobbyInput, index) in hobbyInputs"
+                    v-for="(hobbyInput, index) in user.hobbyInputs"
                     :key="hobbyInput.id">
               <label :for="hobbyInput.id">Hobby #{{ index }}</label>
               <input
@@ -57,7 +64,7 @@
           </div>
         </div>
         <div class="input inline">
-          <input type="checkbox" id="terms" v-model="terms">
+          <input type="checkbox" id="terms" v-model="user.terms">
           <label for="terms">Accept Terms of Use</label>
         </div>
         <div class="submit">
@@ -73,13 +80,16 @@
   export default {
     data () {
       return {
-        email: '',
-        age: null,
-        password: '',
-        confirmPassword: '',
-        country: 'usa',
-        hobbyInputs: [],
-        terms: false
+        user : {
+          email: '',
+          name: '',
+          age: null,
+          password: '',
+          confirmPassword: '',
+          country: 'usa',
+          hobbyInputs: [],
+          terms: false
+        },
       }
     },
     methods: {
@@ -88,21 +98,12 @@
           id: Math.random() * Math.random() * 1000,
           value: ''
         }
-        this.hobbyInputs.push(newHobby)
+        this.user.hobbyInputs.push(newHobby)
       },
       onDeleteHobby (id) {
-        this.hobbyInputs = this.hobbyInputs.filter(hobby => hobby.id !== id)
+        this.user.hobbyInputs = this.user.hobbyInputs.filter(hobby => hobby.id !== id)
       },
       onSubmit () {
-        const formData = {
-          email: this.email,
-          age: this.age,
-          password: this.password,
-          confirmPassword: this.confirmPassword,
-          country: this.country,
-          hobbies: this.hobbyInputs.map(hobby => hobby.value),
-          terms: this.terms
-        }
         this.$swal({
             title: 'Apakah Anda Yakin?',
             icon: 'question',
@@ -112,17 +113,41 @@
             confirmButtonText: 'Ya',
             cancelButtonText: 'Tidak',
             showCloseButton: true,
-            showLoaderOnConfirm: true
+            showLoaderOnConfirm: true,
+            allowOutsideClick: () => this.$swal.isLoading(),
+            preConfirm: () => {
+              return axios.post('/signup',this.user)
+                          .then(res => {
+                            return res;
+                          })
+                          .catch(error => {
+                            return error;
+                          })
+            },
         }).then((result) => {
-            if(result.value) {
-                axios.post('/signup',formData)
-                    .then(res => console.log(res))
-                    .catch(error =>console.log(error))
-                this.$swal('Sukses', 'Data stocks telah dirandom', 'success')
-            } else {
-                this.$swal('Gagal !', 'Data stock belum di akhiri', 'error')
+          if(result.isConfirmed){
+            if (result.value===true) {
+              this.$swal('Sukses', 'Data telah disimpan di database', 'success');
+              this.onReset()
             }
+            else{
+              this.$swal('Sukses', result.value.response.data.results.message, 'error');
+            }
+          }
+          else{
+            this.$swal('Sukses', 'Data belum disimpan di database', 'error');
+          }
         })
+      },
+      onReset(){
+          this.email= '';
+          this.name= '';
+          this.age= null;
+          this.password= '';
+          this.confirmPassword= '';
+          this.country= 'usa';
+          this.hobbyInputs= [];
+          this.terms= false;
       }
     }
   }

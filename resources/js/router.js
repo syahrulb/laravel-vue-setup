@@ -8,7 +8,7 @@ import NotFound from './components/errors/404'
 Vue.use(VueRouter)
 const routes = [
     {
-        path: '/home',
+        path: '/',
         component: WelcomePage
     },
     {
@@ -23,9 +23,17 @@ const routes = [
         path: '/dashboard',
         component: DashboardPage
     },
+    {
+        path: '/404',
+        component: NotFound
+    }, 
+        {
+        path: '*',
+        redirect: '/404'
+    },
 ]
 export default new VueRouter({
-    base: 'server-spa-belajar/admin',
+    base: 'server-spa-belajar',
     mode: 'history',
     routes
 })

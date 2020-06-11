@@ -1,7 +1,7 @@
 <template>
   <header id="header">
     <div class="logo">
-      <router-link to="/home">Vue - Complete Guide</router-link>
+      <router-link to="/">Vue - Complete Guide</router-link>
     </div>
     <nav>
       <ul>
